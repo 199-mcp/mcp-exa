@@ -7,15 +7,15 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerResearchPaperSearchTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "research_paper_search_exa",
-    "Search for academic papers and research using Exa AI - specializes in finding scholarly articles, research papers, and academic content. Returns detailed information about research findings and academic sources.",
+    "academic_search",
+    "Searches academic papers and research. Returns: paper abstracts, citations, authors. Use when: need peer-reviewed sources.",
     {
-      query: z.string().describe("Research paper search query"),
-      numResults: z.number().optional().describe("Number of research papers to return (default: 5)")
+      query: z.string().describe("Academic search query (e.g., 'quantum computing algorithms', 'CRISPR gene editing')"),
+      numResults: z.number().optional().describe("Number of papers to return (1-20, default: 5)")
     },
     async ({ query, numResults }) => {
-      const requestId = `research_paper_search_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'research_paper_search_exa');
+      const requestId = `academic_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'academic_search');
       
       logger.start(query);
       

@@ -7,16 +7,16 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerCompetitorFinderTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "competitor_finder_exa",
-    "Find competitors for a business using Exa AI - identifies similar companies, competitive landscape analysis, and market positioning. Helps discover direct and indirect competitors in any industry.",
+    "competitor_search",
+    "Finds business competitors. Returns: similar companies, market analysis. Use when: asked 'who competes with X' or competitive analysis.",
     {
-      companyName: z.string().describe("Name of the company to find competitors for"),
-      industry: z.string().optional().describe("Industry sector (optional, helps narrow search)"),
-      numResults: z.number().optional().describe("Number of competitors to find (default: 5)")
+      companyName: z.string().describe("Company to analyze (e.g., 'Uber', 'Netflix')"),
+      industry: z.string().optional().describe("Industry sector (e.g., 'ride-sharing', 'streaming entertainment')"),
+      numResults: z.number().optional().describe("Number of competitors to find (1-20, default: 5)")
     },
     async ({ companyName, industry, numResults }) => {
-      const requestId = `competitor_finder_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'competitor_finder_exa');
+      const requestId = `competitor_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'competitor_search');
       
       logger.start(`${companyName} ${industry ? `in ${industry}` : ''}`);
       

@@ -7,16 +7,16 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerGithubSearchTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "github_search_exa",
-    "Search GitHub repositories and code using Exa AI - finds repositories, code snippets, documentation, and developer profiles on GitHub. Useful for finding open source projects, code examples, and technical resources.",
+    "github_search",
+    "Searches GitHub repositories and code. Returns: repos, code snippets, READMEs. Use when: looking for code examples or open source projects.",
     {
-      query: z.string().describe("GitHub search query (repository name, programming language, username, etc.)"),
-      searchType: z.enum(["repositories", "code", "users", "all"]).optional().describe("Type of GitHub content to search (default: all)"),
-      numResults: z.number().optional().describe("Number of GitHub results to return (default: 5)")
+      query: z.string().describe("Search query (e.g., 'machine learning Python', 'react hooks examples')"),
+      searchType: z.enum(["repositories", "code", "users", "all"]).optional().describe("Filter: 'repositories', 'code', 'users', or 'all' (default: all)"),
+      numResults: z.number().optional().describe("Number of results to return (1-20, default: 5)")
     },
     async ({ query, searchType, numResults }) => {
-      const requestId = `github_search_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'github_search_exa');
+      const requestId = `github_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'github_search');
       
       logger.start(`${query} (${searchType || 'all'})`);
       

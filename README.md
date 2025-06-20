@@ -119,14 +119,14 @@ Replace `your-api-key-here` with your actual Exa API key from [dashboard.exa.ai/
 
 The Exa MCP server includes the following tools, which can be enabled by adding the `--tools`:
 
-- **web_search_exa**: Performs real-time web searches with optimized results and content extraction.
-- **research_paper_search**: Specialized search focused on academic papers and research content.
-- **company_research**: Comprehensive company research tool that crawls company websites to gather detailed information about businesses.
-- **crawling**: Extracts content from specific URLs, useful for reading articles, PDFs, or any web page when you have the exact URL.
-- **competitor_finder**: Identifies competitors of a company by searching for businesses offering similar products or services.
-- **linkedin_search**: Search LinkedIn for companies and people using Exa AI. Simply include company names, person names, or specific LinkedIn URLs in your query.
-- **wikipedia_search_exa**: Search and retrieve information from Wikipedia articles on specific topics, giving you accurate, structured knowledge from the world's largest encyclopedia.
-- **github_search**: Search GitHub repositories using Exa AI - performs real-time searches on GitHub.com to find relevant repositories, issues, and GitHub accounts.
+- **web_search**: Searches the web in real-time. Returns: page content, titles, URLs. Use when: need current information beyond training data.
+- **academic_search**: Searches academic papers and research. Returns: paper abstracts, citations, authors. Use when: need peer-reviewed sources.
+- **company_search**: Searches company information and news. Returns: business data, financials, recent news. Use when: researching businesses or organizations.
+- **url_content**: Extracts full content from specific URLs. Returns: complete page text, metadata. Use when: have exact URL to analyze.
+- **competitor_search**: Finds business competitors. Returns: similar companies, market analysis. Use when: asked 'who competes with X' or competitive analysis.
+- **linkedin_search**: Searches LinkedIn profiles and companies. Returns: professional profiles, company pages. Use when: researching people or professional networks.
+- **wikipedia_search**: Searches Wikipedia encyclopedia. Returns: article summaries, factual content. Use when: need encyclopedic or reference information.
+- **github_search**: Searches GitHub repositories and code. Returns: repos, code snippets, READMEs. Use when: looking for code examples or open source projects.
 
 You can choose which tools to enable by adding the `--tools` parameter to your Claude Desktop configuration:
 
@@ -140,7 +140,7 @@ You can choose which tools to enable by adding the `--tools` parameter to your C
       "args": [
         "-y",
         "exa-mcp-server",
-        "--tools=web_search_exa,research_paper_search,company_research,crawling,competitor_finder,linkedin_search,wikipedia_search_exa,github_search"
+        "--tools=web_search,academic_search,company_search,url_content,competitor_search,linkedin_search,wikipedia_search,github_search"
       ],
       "env": {
         "EXA_API_KEY": "your-api-key-here"
@@ -160,7 +160,7 @@ For enabling multiple tools, use a comma-separated list:
       "args": [
         "-y",
         "exa-mcp-server",
-        "--tools=web_search_exa,research_paper_search,company_research,crawling,competitor_finder,linkedin_search,wikipedia_search_exa,github_search"
+        "--tools=web_search,academic_search,company_search,url_content,competitor_search,linkedin_search,wikipedia_search,github_search"
       ],
       "env": {
         "EXA_API_KEY": "your-api-key-here"
@@ -189,10 +189,10 @@ If you prefer to run the server directly, you can use npx:
 npx exa-mcp-server
 
 # Enable specific tools only
-npx exa-mcp-server --tools=web_search_exa
+npx exa-mcp-server --tools=web_search
 
 # Enable multiple tools
-npx exa-mcp-server --tools=web_search_exa,research_paper_search
+npx exa-mcp-server --tools=web_search,academic_search
 
 # List all available tools
 npx exa-mcp-server --list-tools

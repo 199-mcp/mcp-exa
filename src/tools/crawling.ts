@@ -6,15 +6,16 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerCrawlingTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "crawling_exa",
-    "Extract and crawl content from specific URLs using Exa AI - retrieves full text content, metadata, and structured information from web pages. Ideal for extracting detailed content from known URLs.",
+    "url_content",
+    "Extracts full content from specific URLs. Returns: complete page text, metadata. Use when: have exact URL to analyze.",
     {
-      url: z.string().describe("URL to crawl and extract content from"),
-      maxCharacters: z.number().optional().describe("Maximum characters to extract (default: 3000)")
+      url: z.string().describe("URL to extract content from (e.g., 'https://example.com/article')"),
+      maxCharacters: z.number().optional().describe("Maximum characters to extract (1000-10000, default: 3000)"),
+      liveCrawl: z.enum(['always', 'preferred', 'fallback']).optional().describe("Content fetching: 'always' = fresh content, 'preferred' = balance speed/freshness, 'fallback' = cache first (default: preferred)")
     },
-    async ({ url, maxCharacters }) => {
-      const requestId = `crawling_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'crawling_exa');
+    async ({ url, maxCharacters, liveCrawl }) => {
+      const requestId = `url_content-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'url_content');
       
       logger.start(url);
       
@@ -36,7 +37,7 @@ export function registerCrawlingTool(server: McpServer, config?: { exaApiKey?: s
             text: {
               maxCharacters: maxCharacters || API_CONFIG.DEFAULT_MAX_CHARACTERS
             },
-            livecrawl: 'preferred'
+            livecrawl: liveCrawl || 'preferred'
           }
         };
         

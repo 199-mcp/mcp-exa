@@ -22,14 +22,14 @@ export const configSchema = z.object({
 
 // Tool registry for managing available tools
 const availableTools = {
-  'web_search_exa': { name: 'Web Search (Exa)', description: 'Real-time web search using Exa AI', enabled: true },
-  'research_paper_search_exa': { name: 'Research Paper Search', description: 'Search academic papers and research', enabled: true },
-  'company_research_exa': { name: 'Company Research', description: 'Research companies and organizations', enabled: true },
-  'crawling_exa': { name: 'Web Crawling', description: 'Extract content from specific URLs', enabled: true },
-  'competitor_finder_exa': { name: 'Competitor Finder', description: 'Find business competitors', enabled: true },
-  'linkedin_search_exa': { name: 'LinkedIn Search', description: 'Search LinkedIn profiles and companies', enabled: true },
-  'wikipedia_search_exa': { name: 'Wikipedia Search', description: 'Search Wikipedia articles', enabled: true },
-  'github_search_exa': { name: 'GitHub Search', description: 'Search GitHub repositories and code', enabled: true }
+  'web_search': { name: 'Web Search', description: 'Real-time web search', enabled: true },
+  'academic_search': { name: 'Academic Search', description: 'Search academic papers and research', enabled: true },
+  'company_search': { name: 'Company Search', description: 'Research companies and organizations', enabled: true },
+  'url_content': { name: 'URL Content', description: 'Extract content from specific URLs', enabled: true },
+  'competitor_search': { name: 'Competitor Search', description: 'Find business competitors', enabled: true },
+  'linkedin_search': { name: 'LinkedIn Search', description: 'Search LinkedIn profiles and companies', enabled: true },
+  'wikipedia_search': { name: 'Wikipedia Search', description: 'Search Wikipedia articles', enabled: true },
+  'github_search': { name: 'GitHub Search', description: 'Search GitHub repositories and code', enabled: true }
 };
 
 /**
@@ -75,44 +75,44 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
     // Register tools based on configuration
     const registeredTools: string[] = [];
     
-    if (shouldRegisterTool('web_search_exa')) {
+    if (shouldRegisterTool('web_search')) {
       registerWebSearchTool(server, config);
-      registeredTools.push('web_search_exa');
+      registeredTools.push('web_search');
     }
     
-    if (shouldRegisterTool('research_paper_search_exa')) {
+    if (shouldRegisterTool('academic_search')) {
       registerResearchPaperSearchTool(server, config);
-      registeredTools.push('research_paper_search_exa');
+      registeredTools.push('academic_search');
     }
     
-    if (shouldRegisterTool('company_research_exa')) {
+    if (shouldRegisterTool('company_search')) {
       registerCompanyResearchTool(server, config);
-      registeredTools.push('company_research_exa');
+      registeredTools.push('company_search');
     }
     
-    if (shouldRegisterTool('crawling_exa')) {
+    if (shouldRegisterTool('url_content')) {
       registerCrawlingTool(server, config);
-      registeredTools.push('crawling_exa');
+      registeredTools.push('url_content');
     }
     
-    if (shouldRegisterTool('competitor_finder_exa')) {
+    if (shouldRegisterTool('competitor_search')) {
       registerCompetitorFinderTool(server, config);
-      registeredTools.push('competitor_finder_exa');
+      registeredTools.push('competitor_search');
     }
     
-    if (shouldRegisterTool('linkedin_search_exa')) {
+    if (shouldRegisterTool('linkedin_search')) {
       registerLinkedInSearchTool(server, config);
-      registeredTools.push('linkedin_search_exa');
+      registeredTools.push('linkedin_search');
     }
     
-    if (shouldRegisterTool('wikipedia_search_exa')) {
+    if (shouldRegisterTool('wikipedia_search')) {
       registerWikipediaSearchTool(server, config);
-      registeredTools.push('wikipedia_search_exa');
+      registeredTools.push('wikipedia_search');
     }
     
-    if (shouldRegisterTool('github_search_exa')) {
+    if (shouldRegisterTool('github_search')) {
       registerGithubSearchTool(server, config);
-      registeredTools.push('github_search_exa');
+      registeredTools.push('github_search');
     }
     
     if (config.debug) {

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exa MCP Server</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            line-height: 1.6;
+            padding: 60px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            font-weight: 400;
+            color: #666;
+            margin-bottom: 60px;
+        }
+        
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-top: 48px;
+            margin-bottom: 24px;
+        }
+        
+        .tool {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: #FAFAFA;
+            border-radius: 8px;
+        }
+        
+        .tool-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .tool-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        
+        .parameters {
+            margin-top: 16px;
+        }
+        
+        .parameter {
+            font-size: 14px;
+            margin-bottom: 8px;
+            padding-left: 20px;
+        }
+        
+        .parameter-name {
+            font-weight: 500;
+        }
+        
+        .parameter-desc {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .usage {
+            margin-top: 48px;
+            padding: 24px;
+            background: #F5F5F5;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 14px;
+        }
+        
+        .footer {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid #E5E5E5;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        a {
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #DDD;
+        }
+        
+        a:hover {
+            border-bottom-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Exa MCP Server</h1>
+    <p class="subtitle">A Model Context Protocol server for AI-powered web search</p>
+    
+    <h2>Available Tools</h2>
+    
+    <div class="tool">
+        <div class="tool-name">web_search</div>
+        <div class="tool-description">Searches the web in real-time. Returns: page content, titles, URLs. Use when: need current information beyond training data.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query (e.g., 'OpenAI GPT-5 release')</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">liveCrawl</span>: <span class="parameter-desc">'always' | 'preferred' | 'fallback'</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tool">
+        <div class="tool-name">url_content</div>
+        <div class="tool-description">Extracts full content from specific URLs. Returns: complete page text, metadata. Use when: have exact URL to analyze.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">url</span>: <span class="parameter-desc">URL to extract content from</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">maxCharacters</span>: <span class="parameter-desc">Maximum characters (1000-10000, default: 3000)</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">liveCrawl</span>: <span class="parameter-desc">'always' | 'preferred' | 'fallback'</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tool">
+        <div class="tool-name">academic_search</div>
+        <div class="tool-description">Searches academic papers and research. Returns: paper abstracts, citations, authors. Use when: need peer-reviewed sources.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">query</span>: <span class="parameter-desc">Academic search query</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of papers (1-20, default: 5)</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tool">
+        <div class="tool-name">company_search</div>
+        <div class="tool-description">Searches company information and news. Returns: business data, financials, recent news. Use when: researching businesses or organizations.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">companyName</span>: <span class="parameter-desc">Company name (e.g., 'OpenAI', 'Tesla Inc')</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tool">
+        <div class="tool-name">competitor_search</div>
+        <div class="tool-description">Finds business competitors. Returns: similar companies, market analysis. Use when: asked 'who competes with X' or competitive analysis.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">companyName</span>: <span class="parameter-desc">Company to analyze</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">industry</span>: <span class="parameter-desc">Industry sector (optional)</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of competitors (1-20, default: 5)</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tool">
+        <div class="tool-name">linkedin_search</div>
+        <div class="tool-description">Searches LinkedIn profiles and companies. Returns: professional profiles, company pages. Use when: researching people or professional networks.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">searchType</span>: <span class="parameter-desc">'profiles' | 'companies' | 'all'</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tool">
+        <div class="tool-name">wikipedia_search</div>
+        <div class="tool-description">Searches Wikipedia encyclopedia. Returns: article summaries, factual content. Use when: need encyclopedic or reference information.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of articles (1-20, default: 5)</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tool">
+        <div class="tool-name">github_search</div>
+        <div class="tool-description">Searches GitHub repositories and code. Returns: repos, code snippets, READMEs. Use when: looking for code examples or open source projects.</div>
+        <div class="parameters">
+            <div class="parameter">
+                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">searchType</span>: <span class="parameter-desc">'repositories' | 'code' | 'users' | 'all'</span>
+            </div>
+            <div class="parameter">
+                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Usage</h2>
+    <div class="usage">
+        SSE Endpoint: https://exa.atp.dev/api/mcp?exaApiKey=YOUR_API_KEY
+    </div>
+    
+    <div class="footer">
+        <p>Fork enhanced with SSE support by <a href="https://github.com/BorisDjordje">Boris Djordjevic</a> at <a href="https://github.com/199-biotechnologies">199 Biotechnologies</a></p>
+    </div>
+</body>
+</html>

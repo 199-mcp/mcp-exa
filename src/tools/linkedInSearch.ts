@@ -7,16 +7,16 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerLinkedInSearchTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "linkedin_search_exa",
-    "Search LinkedIn profiles and companies using Exa AI - finds professional profiles, company pages, and business-related content on LinkedIn. Useful for networking, recruitment, and business research.",
+    "linkedin_search",
+    "Searches LinkedIn profiles and companies. Returns: professional profiles, company pages. Use when: researching people or professional networks.",
     {
-      query: z.string().describe("LinkedIn search query (e.g., person name, company, job title)"),
-      searchType: z.enum(["profiles", "companies", "all"]).optional().describe("Type of LinkedIn content to search (default: all)"),
-      numResults: z.number().optional().describe("Number of LinkedIn results to return (default: 5)")
+      query: z.string().describe("Search query (e.g., 'John Doe software engineer', 'Apple Inc')"),
+      searchType: z.enum(["profiles", "companies", "all"]).optional().describe("Filter: 'profiles' for people, 'companies' for orgs, 'all' for both (default: all)"),
+      numResults: z.number().optional().describe("Number of results to return (1-20, default: 5)")
     },
     async ({ query, searchType, numResults }) => {
-      const requestId = `linkedin_search_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'linkedin_search_exa');
+      const requestId = `linkedin_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'linkedin_search');
       
       logger.start(`${query} (${searchType || 'all'})`);
       

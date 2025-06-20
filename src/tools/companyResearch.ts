@@ -7,15 +7,15 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerCompanyResearchTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "company_research_exa",
-    "Research companies using Exa AI - finds comprehensive information about businesses, organizations, and corporations. Provides insights into company operations, news, financial information, and industry analysis.",
+    "company_search",
+    "Searches company information and news. Returns: business data, financials, recent news. Use when: researching businesses or organizations.",
     {
-      companyName: z.string().describe("Name of the company to research"),
-      numResults: z.number().optional().describe("Number of search results to return (default: 5)")
+      companyName: z.string().describe("Company name (e.g., 'OpenAI', 'Tesla Inc', 'Microsoft Corporation')"),
+      numResults: z.number().optional().describe("Number of results to return (1-20, default: 5)")
     },
     async ({ companyName, numResults }) => {
-      const requestId = `company_research_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'company_research_exa');
+      const requestId = `company_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'company_search');
       
       logger.start(companyName);
       

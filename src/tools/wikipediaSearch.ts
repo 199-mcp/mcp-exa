@@ -7,15 +7,15 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerWikipediaSearchTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "wikipedia_search_exa",
-    "Search Wikipedia articles using Exa AI - finds comprehensive, factual information from Wikipedia entries. Ideal for research, fact-checking, and getting authoritative information on various topics.",
+    "wikipedia_search",
+    "Searches Wikipedia encyclopedia. Returns: article summaries, factual content. Use when: need encyclopedic or reference information.",
     {
-      query: z.string().describe("Wikipedia search query (topic, person, place, concept, etc.)"),
-      numResults: z.number().optional().describe("Number of Wikipedia articles to return (default: 5)")
+      query: z.string().describe("Search query (e.g., 'quantum mechanics', 'World War II', 'Python programming')"),
+      numResults: z.number().optional().describe("Number of articles to return (1-20, default: 5)")
     },
     async ({ query, numResults }) => {
-      const requestId = `wikipedia_search_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'wikipedia_search_exa');
+      const requestId = `wikipedia_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'wikipedia_search');
       
       logger.start(query);
       

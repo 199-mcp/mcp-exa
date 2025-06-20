@@ -7,15 +7,16 @@ import { createRequestLogger } from "../utils/logger.js";
 
 export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
-    "web_search_exa",
-    "Search the web using Exa AI - performs real-time web searches and can scrape content from specific URLs. Supports configurable result counts and returns the content from the most relevant websites.",
+    "web_search",
+    "Searches the web in real-time. Returns: page content, titles, URLs. Use when: need current information beyond training data.",
     {
-      query: z.string().describe("Search query"),
-      numResults: z.number().optional().describe("Number of search results to return (default: 5)")
+      query: z.string().describe("Search query (e.g., 'OpenAI GPT-5 release', 'climate change 2024')"),
+      numResults: z.number().optional().describe("Number of results to return (1-20, default: 5)"),
+      liveCrawl: z.enum(['always', 'preferred', 'fallback']).optional().describe("Content fetching: 'always' = fresh content, 'preferred' = balance speed/freshness, 'fallback' = cache first (default: preferred)")
     },
-    async ({ query, numResults }) => {
-      const requestId = `web_search_exa-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-      const logger = createRequestLogger(requestId, 'web_search_exa');
+    async ({ query, numResults, liveCrawl }) => {
+      const requestId = `web_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const logger = createRequestLogger(requestId, 'web_search');
       
       logger.start(query);
       
@@ -39,7 +40,7 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
             text: {
               maxCharacters: API_CONFIG.DEFAULT_MAX_CHARACTERS
             },
-            livecrawl: 'preferred'
+            livecrawl: liveCrawl || 'preferred'
           }
         };
         
