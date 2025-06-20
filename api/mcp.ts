@@ -16,6 +16,12 @@ export default async function handler(req: any, res: any) {
         return;
       }
       
+      // Set SSE headers to prevent proxy buffering
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+      
       // Create a new SSE transport for the client
       const transport = new SSEServerTransport('/api/mcp', res);
       
@@ -28,6 +34,8 @@ export default async function handler(req: any, res: any) {
         try {
           // Send SSE comment as keep-alive
           res.write(':keep-alive\n\n');
+          // Force flush past proxy buffers
+          res.flush?.();
         } catch (error) {
           // Connection closed, clean up
           clearInterval(heartbeatInterval);

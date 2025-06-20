@@ -9,9 +9,12 @@ A Model Context Protocol (MCP) server lets AI assistants like Claude use the Exa
 This is an enhanced fork of the original [Exa MCP Server](https://github.com/exa-labs/exa-mcp-server) by the Exa team. This fork adds support for Server-Sent Events (SSE) to enable remote MCP connections for any platform that supports SSE-based communication.
 
 ### Key Improvements
-- **SSE Support**: Added Server-Sent Events transport for remote MCP connections
+- **SSE Support**: Added Server-Sent Events transport for remote MCP connections with heartbeat to prevent proxy timeouts
 - **Secure API Key Handling**: Enhanced security by accepting API keys as URL parameters instead of environment variables
 - **Vercel Deployment**: Improved deployment configuration for self-hosting on Vercel
+- **Performance Optimizations**: Implemented connection pooling with HTTP keep-alive for faster API requests
+- **Better Error Handling**: Properly surfaces 4xx errors (rate limits, etc.) for cleaner debugging
+- **Interactive Landing Page**: Added a minimalist schema viewer at [exa.atp.dev](https://exa.atp.dev) that dynamically displays available tools
 
 ### Credits
 - **Original Authors**: The Exa team at [Exa AI](https://exa.ai)
@@ -46,7 +49,7 @@ Replace `your-exa-api-key` with your actual Exa API key from [dashboard.exa.ai/a
 
 #### For SSE-Compatible Platforms
 
-For platforms that support SSE-based MCP connections (like ElevenLabs Conversational AI), use:
+For platforms that support SSE-based MCP connections, use:
 
 - **Server type**: SSE
 - **URL**: `https://exa.atp.dev/api/mcp?exaApiKey=your-exa-api-key`

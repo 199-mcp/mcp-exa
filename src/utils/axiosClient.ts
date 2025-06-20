@@ -33,7 +33,7 @@ const createExaClient = (apiKey: string): AxiosInstance => {
       'x-api-key': apiKey
     },
     timeout: 25000,
-    validateStatus: (status) => status < 500 // Only throw for 5xx errors
+    validateStatus: (status) => status >= 200 && status < 300 // Only 2xx is success
   });
 
   clientCache.set(apiKey, client);
@@ -43,5 +43,11 @@ const createExaClient = (apiKey: string): AxiosInstance => {
 // Export a factory function that tools can use
 export const getExaClient = (config?: { exaApiKey?: string }): AxiosInstance => {
   const apiKey = config?.exaApiKey || process.env.EXA_API_KEY || '';
+  
+  // Naive cache size limit to prevent unbounded growth
+  if (clientCache.size > 50) {
+    clientCache.clear();
+  }
+  
   return createExaClient(apiKey);
 };
