@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import https from 'https';
 import { API_CONFIG } from '../tools/config.js';
 
@@ -12,9 +12,19 @@ const httpsAgent = new https.Agent({
   rejectUnauthorized: true // Verify SSL certificates
 });
 
-// Create a shared axios instance with keep-alive
-export const createExaClient = (apiKey: string) => {
-  return axios.create({
+// Cache axios instances by API key to truly reuse connections
+const clientCache = new Map<string, AxiosInstance>();
+
+// Create or get cached axios instance
+const createExaClient = (apiKey: string): AxiosInstance => {
+  // Check if we already have a client for this API key
+  const cached = clientCache.get(apiKey);
+  if (cached) {
+    return cached;
+  }
+
+  // Create new client and cache it
+  const client = axios.create({
     baseURL: API_CONFIG.BASE_URL,
     httpsAgent,
     headers: {
@@ -23,13 +33,15 @@ export const createExaClient = (apiKey: string) => {
       'x-api-key': apiKey
     },
     timeout: 25000,
-    // Retry logic can be added here with axios-retry if needed
     validateStatus: (status) => status < 500 // Only throw for 5xx errors
   });
+
+  clientCache.set(apiKey, client);
+  return client;
 };
 
 // Export a factory function that tools can use
-export const getExaClient = (config?: { exaApiKey?: string }) => {
+export const getExaClient = (config?: { exaApiKey?: string }): AxiosInstance => {
   const apiKey = config?.exaApiKey || process.env.EXA_API_KEY || '';
   return createExaClient(apiKey);
 };
