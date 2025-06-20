@@ -250,10 +250,6 @@ Replace `your-exa-api-key` with your actual Exa API key.
    * Restart Claude Desktop completely
    * Check Claude Desktop logs:
 
-<br>
-
 ---
-
-Built with ❤️ by team Exa
 
 Fork enhanced with SSE support by [Boris Djordjevic](https://github.com/BorisDjordje) at [199 Biotechnologies](https://github.com/199-biotechnologies)
