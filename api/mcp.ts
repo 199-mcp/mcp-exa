@@ -23,8 +23,20 @@ export default async function handler(req: any, res: any) {
       const sessionId = (transport as any)._sessionId;
       transports[sessionId] = transport;
       
+      // Set up SSE heartbeat to prevent proxy timeouts
+      const heartbeatInterval = setInterval(() => {
+        try {
+          // Send SSE comment as keep-alive
+          res.write(':keep-alive\n\n');
+        } catch (error) {
+          // Connection closed, clean up
+          clearInterval(heartbeatInterval);
+        }
+      }, 20000); // Send heartbeat every 20 seconds
+      
       // Set up onclose handler to clean up transport when closed
       transport.onclose = () => {
+        clearInterval(heartbeatInterval);
         delete transports[sessionId];
       };
       
