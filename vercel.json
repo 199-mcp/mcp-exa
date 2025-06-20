@@ -5,6 +5,7 @@
   ],
   "routes": [
     { "src": "/api/mcp(?:/.*)?", "dest": "/api/mcp.ts" },
+    { "src": "/api/schema", "dest": "/api/schema.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/", "dest": "/api/index.ts" }
   ]

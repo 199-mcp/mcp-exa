@@ -116,123 +116,9 @@
     <p class="subtitle">A Model Context Protocol server for AI-powered web search</p>
     
     <h2>Available Tools</h2>
-    
-    <div class="tool">
-        <div class="tool-name">web_search</div>
-        <div class="tool-description">Searches the web in real-time. Returns: page content, titles, URLs. Use when: need current information beyond training data.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query (e.g., 'OpenAI GPT-5 release')</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">liveCrawl</span>: <span class="parameter-desc">'always' | 'preferred' | 'fallback'</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tool">
-        <div class="tool-name">url_content</div>
-        <div class="tool-description">Extracts full content from specific URLs. Returns: complete page text, metadata. Use when: have exact URL to analyze.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">url</span>: <span class="parameter-desc">URL to extract content from</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">maxCharacters</span>: <span class="parameter-desc">Maximum characters (1000-10000, default: 3000)</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">liveCrawl</span>: <span class="parameter-desc">'always' | 'preferred' | 'fallback'</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tool">
-        <div class="tool-name">academic_search</div>
-        <div class="tool-description">Searches academic papers and research. Returns: paper abstracts, citations, authors. Use when: need peer-reviewed sources.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">query</span>: <span class="parameter-desc">Academic search query</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of papers (1-20, default: 5)</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tool">
-        <div class="tool-name">company_search</div>
-        <div class="tool-description">Searches company information and news. Returns: business data, financials, recent news. Use when: researching businesses or organizations.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">companyName</span>: <span class="parameter-desc">Company name (e.g., 'OpenAI', 'Tesla Inc')</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tool">
-        <div class="tool-name">competitor_search</div>
-        <div class="tool-description">Finds business competitors. Returns: similar companies, market analysis. Use when: asked 'who competes with X' or competitive analysis.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">companyName</span>: <span class="parameter-desc">Company to analyze</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">industry</span>: <span class="parameter-desc">Industry sector (optional)</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of competitors (1-20, default: 5)</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tool">
-        <div class="tool-name">linkedin_search</div>
-        <div class="tool-description">Searches LinkedIn profiles and companies. Returns: professional profiles, company pages. Use when: researching people or professional networks.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">searchType</span>: <span class="parameter-desc">'profiles' | 'companies' | 'all'</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tool">
-        <div class="tool-name">wikipedia_search</div>
-        <div class="tool-description">Searches Wikipedia encyclopedia. Returns: article summaries, factual content. Use when: need encyclopedic or reference information.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of articles (1-20, default: 5)</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tool">
-        <div class="tool-name">github_search</div>
-        <div class="tool-description">Searches GitHub repositories and code. Returns: repos, code snippets, READMEs. Use when: looking for code examples or open source projects.</div>
-        <div class="parameters">
-            <div class="parameter">
-                <span class="parameter-name">query</span>: <span class="parameter-desc">Search query</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">searchType</span>: <span class="parameter-desc">'repositories' | 'code' | 'users' | 'all'</span>
-            </div>
-            <div class="parameter">
-                <span class="parameter-name">numResults</span>: <span class="parameter-desc">Number of results (1-20, default: 5)</span>
-            </div>
+    <div id="tools-container">
+        <div style="text-align: center; padding: 40px; color: #999;">
+            Loading tools...
         </div>
     </div>
     
@@ -244,5 +130,56 @@
     <div class="footer">
         <p>Fork enhanced with SSE support by <a href="https://github.com/BorisDjordje">Boris Djordjevic</a> at <a href="https://github.com/199-biotechnologies">199 Biotechnologies</a></p>
     </div>
+    
+    <script>
+        async function loadTools() {
+            try {
+                const response = await fetch('/api/schema');
+                const data = await response.json();
+                const container = document.getElementById('tools-container');
+                
+                if (!data.tools || data.tools.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No tools available</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.tools.map(tool => {
+                    const params = tool.inputSchema?.properties || {};
+                    const required = tool.inputSchema?.required || [];
+                    
+                    return `
+                        <div class="tool">
+                            <div class="tool-name">${tool.name}</div>
+                            <div class="tool-description">${tool.description}</div>
+                            ${Object.keys(params).length > 0 ? `
+                                <div class="parameters">
+                                    ${Object.entries(params).map(([name, schema]) => {
+                                        const isRequired = required.includes(name);
+                                        const type = schema.type || '';
+                                        const enumValues = schema.enum ? schema.enum.join(' | ') : '';
+                                        const description = schema.description || '';
+                                        
+                                        return `
+                                            <div class="parameter">
+                                                <span class="parameter-name">${name}</span>${!isRequired ? ' (optional)' : ''}: 
+                                                <span class="parameter-desc">${description}${enumValues ? ` (${enumValues})` : ''}</span>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Failed to load tools:', error);
+                document.getElementById('tools-container').innerHTML = 
+                    '<div style="text-align: center; padding: 40px; color: #999;">Failed to load tools</div>';
+            }
+        }
+        
+        // Load tools when page loads
+        loadTools();
+    </script>
 </body>
 </html>
