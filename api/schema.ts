@@ -31,11 +31,34 @@ export default function handler(req: any, res: any) {
   // Extract tool information from the server
   const registeredTools = (server as any)._registeredTools || {};
   
-  const schema = Object.entries(registeredTools).map(([name, tool]: [string, any]) => ({
-    name,
-    description: tool.description,
-    inputSchema: tool.inputSchema?._def || tool.inputSchema
-  }));
+  const schema = Object.entries(registeredTools).map(([name, tool]: [string, any]) => {
+    // Extract the shape from Zod schema to get parameter info
+    const shape = tool.inputSchema?.shape || {};
+    const properties: any = {};
+    const required: string[] = [];
+    
+    for (const [key, value] of Object.entries(shape)) {
+      const zodSchema = value as any;
+      properties[key] = {
+        type: zodSchema._def?.typeName?.replace('Zod', '').toLowerCase() || 'string',
+        description: zodSchema._def?.description || '',
+        enum: zodSchema._def?.values || undefined
+      };
+      
+      if (!zodSchema.isOptional()) {
+        required.push(key);
+      }
+    }
+    
+    return {
+      name,
+      description: tool.description,
+      inputSchema: {
+        properties,
+        required
+      }
+    };
+  });
 
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
