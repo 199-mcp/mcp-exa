@@ -6,11 +6,11 @@ A Model Context Protocol (MCP) server lets AI assistants like Claude use the Exa
 
 ## 🔀 About This Fork
 
-This is an enhanced fork of the original [Exa MCP Server](https://github.com/exa-labs/exa-mcp-server) by the Exa team. This fork adds support for Server-Sent Events (SSE) to enable compatibility with ElevenLabs Conversational AI and other platforms that require SSE-based MCP connections.
+This is an enhanced fork of the original [Exa MCP Server](https://github.com/exa-labs/exa-mcp-server) by the Exa team. This fork adds support for Server-Sent Events (SSE) to enable remote MCP connections for any platform that supports SSE-based communication.
 
 ### Key Improvements
-- **SSE Support**: Added Server-Sent Events support for ElevenLabs Conversational AI integration
-- **Secure API Key Handling**: Enhanced security for API key management in hosted environments
+- **SSE Support**: Added Server-Sent Events transport for remote MCP connections
+- **Secure API Key Handling**: Enhanced security by accepting API keys as URL parameters instead of environment variables
 - **Vercel Deployment**: Improved deployment configuration for self-hosting on Vercel
 
 ### Credits
@@ -44,14 +44,11 @@ Add this to your Claude Desktop configuration file:
 
 Replace `your-exa-api-key` with your actual Exa API key from [dashboard.exa.ai/api-keys](https://dashboard.exa.ai/api-keys).
 
-#### For ElevenLabs Conversational AI
+#### For SSE-Compatible Platforms
 
-Use these settings when adding a custom MCP server:
+For platforms that support SSE-based MCP connections (like ElevenLabs Conversational AI), use:
 
-- **Name**: Exa Search
-- **Description**: Web search capabilities powered by Exa AI
 - **Server type**: SSE
-- **Server URL Type**: Value
 - **URL**: `https://exa.atp.dev/api/mcp?exaApiKey=your-exa-api-key`
 
 Replace `your-exa-api-key` with your actual Exa API key from [dashboard.exa.ai/api-keys](https://dashboard.exa.ai/api-keys).
@@ -230,7 +227,7 @@ You can deploy your own instance of the Exa MCP server on Vercel:
 }
 ```
 
-#### With ElevenLabs
+#### With SSE-Compatible Platforms
 - **Server type**: SSE
 - **URL**: `https://your-project.vercel.app/api/mcp?exaApiKey=your-exa-api-key`
 
