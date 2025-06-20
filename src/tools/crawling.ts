@@ -3,6 +3,7 @@ import axios from "axios";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { API_CONFIG } from "./config.js";
 import { createRequestLogger } from "../utils/logger.js";
+import { getExaClient } from "../utils/axiosClient.js";
 
 export function registerCrawlingTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
@@ -20,16 +21,8 @@ export function registerCrawlingTool(server: McpServer, config?: { exaApiKey?: s
       logger.start(url);
       
       try {
-        // Create a fresh axios instance for each request
-        const axiosInstance = axios.create({
-          baseURL: API_CONFIG.BASE_URL,
-          headers: {
-            'accept': 'application/json',
-            'content-type': 'application/json',
-            'x-api-key': config?.exaApiKey || process.env.EXA_API_KEY || ''
-          },
-          timeout: 25000
-        });
+        // Use shared axios client with keep-alive
+        const axiosInstance = getExaClient(config);
 
         const crawlRequest = {
           ids: [url],
@@ -45,8 +38,7 @@ export function registerCrawlingTool(server: McpServer, config?: { exaApiKey?: s
         
         const response = await axiosInstance.post(
           '/contents',
-          crawlRequest,
-          { timeout: 25000 }
+          crawlRequest
         );
         
         logger.log("Received response from Exa API");

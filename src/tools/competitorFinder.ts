@@ -4,6 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { API_CONFIG } from "./config.js";
 import { ExaSearchRequest, ExaSearchResponse } from "../types.js";
 import { createRequestLogger } from "../utils/logger.js";
+import { getExaClient } from "../utils/axiosClient.js";
 
 export function registerCompetitorFinderTool(server: McpServer, config?: { exaApiKey?: string }): void {
   server.tool(
@@ -21,16 +22,8 @@ export function registerCompetitorFinderTool(server: McpServer, config?: { exaAp
       logger.start(`${companyName} ${industry ? `in ${industry}` : ''}`);
       
       try {
-        // Create a fresh axios instance for each request
-        const axiosInstance = axios.create({
-          baseURL: API_CONFIG.BASE_URL,
-          headers: {
-            'accept': 'application/json',
-            'content-type': 'application/json',
-            'x-api-key': config?.exaApiKey || process.env.EXA_API_KEY || ''
-          },
-          timeout: 25000
-        });
+        // Use shared axios client with keep-alive
+        const axiosInstance = getExaClient(config);
 
         const searchQuery = industry 
           ? `${companyName} competitors similar companies ${industry} industry competitive landscape`
@@ -53,8 +46,7 @@ export function registerCompetitorFinderTool(server: McpServer, config?: { exaAp
         
         const response = await axiosInstance.post<ExaSearchResponse>(
           API_CONFIG.ENDPOINTS.SEARCH,
-          searchRequest,
-          { timeout: 25000 }
+          searchRequest
         );
         
         logger.log("Received response from Exa API");
