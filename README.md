@@ -4,6 +4,19 @@
 
 A Model Context Protocol (MCP) server lets AI assistants like Claude use the Exa AI Search API for web searches. This setup allows AI models to get real-time web information in a safe and controlled way.
 
+## 🔀 About This Fork
+
+This is an enhanced fork of the original [Exa MCP Server](https://github.com/exa-labs/exa-mcp-server) by the Exa team. This fork adds support for Server-Sent Events (SSE) to enable compatibility with ElevenLabs Conversational AI and other platforms that require SSE-based MCP connections.
+
+### Key Improvements
+- **SSE Support**: Added Server-Sent Events support for ElevenLabs Conversational AI integration
+- **Secure API Key Handling**: Enhanced security for API key management in hosted environments
+- **Vercel Deployment**: Improved deployment configuration for self-hosting on Vercel
+
+### Credits
+- **Original Authors**: The Exa team at [Exa AI](https://exa.ai)
+- **Fork Maintainer**: [Boris Djordjevic](https://github.com/BorisDjordje) at [199 Biotechnologies](https://github.com/199-biotechnologies)
+
 ## Installation Options
 
 ### Option 1: Remote Hosted Server (Recommended) 🌐
@@ -245,3 +258,5 @@ Replace `your-exa-api-key` with your actual Exa API key.
 ---
 
 Built with ❤️ by team Exa
+
+Fork enhanced with SSE support by [Boris Djordjevic](https://github.com/BorisDjordje) at [199 Biotechnologies](https://github.com/199-biotechnologies)
