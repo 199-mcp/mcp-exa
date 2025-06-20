@@ -6,8 +6,5 @@
   "routes": [
     { "src": "/api/mcp(?:/.*)?", "dest": "/api/mcp.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1" }
-  ],
-  "env": {
-    "MCP_TOOLS": "web_search_exa"
-  }
+  ]
 }

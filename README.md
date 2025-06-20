@@ -4,19 +4,13 @@
 
 A Model Context Protocol (MCP) server lets AI assistants like Claude use the Exa AI Search API for web searches. This setup allows AI models to get real-time web information in a safe and controlled way.
 
-## Remote Exa MCP 🌐
+## Installation Options
 
-Connect directly to Exa's hosted MCP server (instead of running it locally).
+### Option 1: Remote Hosted Server (Recommended) 🌐
 
-### Remote Exa MCP URL
+Connect directly to Exa's hosted MCP server without running anything locally.
 
-```
-https://mcp.exa.ai/mcp?exaApiKey=your-exa-api-key
-```
-
-Replace `your-api-key-here` with your actual Exa API key from [dashboard.exa.ai/api-keys](https://dashboard.exa.ai/api-keys).
-
-### Claude Desktop Configuration for Remote MCP
+#### For Claude Desktop
 
 Add this to your Claude Desktop configuration file:
 
@@ -35,13 +29,29 @@ Add this to your Claude Desktop configuration file:
 }
 ```
 
-### NPM Installation
+Replace `your-exa-api-key` with your actual Exa API key from [dashboard.exa.ai/api-keys](https://dashboard.exa.ai/api-keys).
+
+#### For ElevenLabs Conversational AI
+
+Use these settings when adding a custom MCP server:
+
+- **Name**: Exa Search
+- **Description**: Web search capabilities powered by Exa AI
+- **Server type**: SSE
+- **Server URL Type**: Value
+- **URL**: `https://exa.atp.dev/api/mcp?exaApiKey=your-exa-api-key`
+
+Replace `your-exa-api-key` with your actual Exa API key from [dashboard.exa.ai/api-keys](https://dashboard.exa.ai/api-keys).
+
+### Option 2: Local Installation
+
+#### NPM Installation
 
 ```bash
 npm install -g exa-mcp-server
 ```
 
-### Using Smithery
+#### Using Smithery
 
 To install the Exa MCP server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/exa):
 
@@ -177,6 +187,41 @@ npx exa-mcp-server --tools=web_search_exa,research_paper_search
 # List all available tools
 npx exa-mcp-server --list-tools
 ```
+
+## Self-Hosting on Vercel 🚀
+
+You can deploy your own instance of the Exa MCP server on Vercel:
+
+1. Fork this repository
+2. Deploy to Vercel using the button below:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/exa-labs/exa-mcp-server)
+
+3. Your server will be available at `https://your-project.vercel.app/api/mcp`
+
+### Using Your Self-Hosted Server
+
+#### With Claude Desktop
+```json
+{
+  "mcpServers": {
+    "exa": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://your-project.vercel.app/api/mcp?exaApiKey=your-exa-api-key"
+      ]
+    }
+  }
+}
+```
+
+#### With ElevenLabs
+- **Server type**: SSE
+- **URL**: `https://your-project.vercel.app/api/mcp?exaApiKey=your-exa-api-key`
+
+Replace `your-exa-api-key` with your actual Exa API key.
 
 ## Troubleshooting 🔧
 
