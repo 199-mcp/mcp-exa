@@ -33,7 +33,7 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
             text: {
               maxCharacters: API_CONFIG.DEFAULT_MAX_CHARACTERS
             },
-            livecrawl: liveCrawl || 'preferred'
+            livecrawl: liveCrawl || 'fallback'
           }
         };
         

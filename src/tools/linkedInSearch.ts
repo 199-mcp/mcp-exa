@@ -42,7 +42,7 @@ export function registerLinkedInSearchTool(server: McpServer, config?: { exaApiK
             text: {
               maxCharacters: API_CONFIG.DEFAULT_MAX_CHARACTERS
             },
-            livecrawl: 'preferred'
+            livecrawl: 'fallback'
           },
           includeDomains: ["linkedin.com"]
         };

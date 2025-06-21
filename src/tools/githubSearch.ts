@@ -44,7 +44,7 @@ export function registerGithubSearchTool(server: McpServer, config?: { exaApiKey
             text: {
               maxCharacters: API_CONFIG.DEFAULT_MAX_CHARACTERS
             },
-            livecrawl: 'preferred'
+            livecrawl: 'fallback'
           },
           includeDomains: ["github.com"]
         };
