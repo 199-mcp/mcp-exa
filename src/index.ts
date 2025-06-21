@@ -47,12 +47,19 @@ const availableTools = {
  * - And more!
  */
 
-export default function ({ config }: { config: z.infer<typeof configSchema> }) {
+export default function ({ config }: { config?: z.infer<typeof configSchema> } = {}) {
   try {
-    // Set the API key in environment for tool functions to use
-    // process.env.EXA_API_KEY = config.exaApiKey;
+    // Default config if not provided
+    const actualConfig = config || {
+      exaApiKey: process.env.EXA_API_KEY,
+      enabledTools: undefined, // This will enable all tools
+      debug: false
+    };
     
-    if (config.debug) {
+    // Set the API key in environment for tool functions to use
+    // process.env.EXA_API_KEY = actualConfig.exaApiKey;
+    
+    if (actualConfig.debug) {
       log("Starting Exa MCP Server in debug mode");
     }
 
@@ -66,8 +73,8 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
 
     // Helper function to check if a tool should be registered
     const shouldRegisterTool = (toolId: string): boolean => {
-      if (config.enabledTools && config.enabledTools.length > 0) {
-        return config.enabledTools.includes(toolId);
+      if (actualConfig.enabledTools && actualConfig.enabledTools.length > 0) {
+        return actualConfig.enabledTools.includes(toolId);
       }
       return availableTools[toolId as keyof typeof availableTools]?.enabled ?? false;
     };
@@ -76,46 +83,46 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
     const registeredTools: string[] = [];
     
     if (shouldRegisterTool('web_search')) {
-      registerWebSearchTool(server, config);
+      registerWebSearchTool(server, actualConfig);
       registeredTools.push('web_search');
     }
     
     if (shouldRegisterTool('academic_search')) {
-      registerResearchPaperSearchTool(server, config);
+      registerResearchPaperSearchTool(server, actualConfig);
       registeredTools.push('academic_search');
     }
     
     if (shouldRegisterTool('company_search')) {
-      registerCompanyResearchTool(server, config);
+      registerCompanyResearchTool(server, actualConfig);
       registeredTools.push('company_search');
     }
     
     if (shouldRegisterTool('url_content')) {
-      registerCrawlingTool(server, config);
+      registerCrawlingTool(server, actualConfig);
       registeredTools.push('url_content');
     }
     
     if (shouldRegisterTool('competitor_search')) {
-      registerCompetitorFinderTool(server, config);
+      registerCompetitorFinderTool(server, actualConfig);
       registeredTools.push('competitor_search');
     }
     
     if (shouldRegisterTool('linkedin_search')) {
-      registerLinkedInSearchTool(server, config);
+      registerLinkedInSearchTool(server, actualConfig);
       registeredTools.push('linkedin_search');
     }
     
     if (shouldRegisterTool('wikipedia_search')) {
-      registerWikipediaSearchTool(server, config);
+      registerWikipediaSearchTool(server, actualConfig);
       registeredTools.push('wikipedia_search');
     }
     
     if (shouldRegisterTool('github_search')) {
-      registerGithubSearchTool(server, config);
+      registerGithubSearchTool(server, actualConfig);
       registeredTools.push('github_search');
     }
     
-    if (config.debug) {
+    if (actualConfig.debug) {
       log(`Registered ${registeredTools.length} tools: ${registeredTools.join(', ')}`);
     }
     
