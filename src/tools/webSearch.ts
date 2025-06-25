@@ -13,7 +13,7 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
     {
       query: z.string().describe("Search query (e.g., 'OpenAI GPT-5 release', 'climate change 2024')"),
       numResults: z.number().optional().describe("Number of results to return (1-20, default: 5)"),
-      liveCrawl: z.enum(['always', 'preferred', 'fallback']).optional().describe("Content fetching: 'always' = fresh content, 'preferred' = balance speed/freshness, 'fallback' = cache first (default: preferred)")
+      liveCrawl: z.enum(['always', 'auto', 'fallback', 'never']).optional().describe("Content fetching: 'always' = fresh content, 'auto' = balance speed/freshness, 'fallback' = cache first, 'never' = cache only (default: auto)")
     },
     async ({ query, numResults, liveCrawl }) => {
       const requestId = `web_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -33,7 +33,7 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
             text: {
               maxCharacters: API_CONFIG.DEFAULT_MAX_CHARACTERS
             },
-            livecrawl: liveCrawl || 'fallback'
+            livecrawl: liveCrawl || 'auto'
           }
         };
         

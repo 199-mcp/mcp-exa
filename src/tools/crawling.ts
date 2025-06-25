@@ -13,7 +13,7 @@ export function registerCrawlingTool(server: McpServer, config?: { exaApiKey?: s
     {
       url: z.string().describe("URL to extract content from (e.g., 'https://example.com/article')"),
       maxCharacters: z.number().optional().describe("Maximum characters to extract (1000-10000, default: 3000)"),
-      liveCrawl: z.enum(['always', 'preferred', 'fallback']).optional().describe("Content fetching: 'always' = fresh content, 'preferred' = balance speed/freshness, 'fallback' = cache first (default: preferred)")
+      liveCrawl: z.enum(['always', 'auto', 'fallback', 'never']).optional().describe("Content fetching: 'always' = fresh content, 'auto' = balance speed/freshness, 'fallback' = cache first, 'never' = cache only (default: auto)")
     },
     async ({ url, maxCharacters, liveCrawl }) => {
       const requestId = `url_content-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -30,7 +30,7 @@ export function registerCrawlingTool(server: McpServer, config?: { exaApiKey?: s
           text: {
             maxCharacters: maxCharacters || API_CONFIG.DEFAULT_MAX_CHARACTERS
           },
-          livecrawl: liveCrawl || 'fallback'
+          livecrawl: liveCrawl || 'auto'
         };
         
         logger.log("Sending crawl request to Exa API");
