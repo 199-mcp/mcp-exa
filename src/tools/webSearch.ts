@@ -149,6 +149,19 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
       logger.start(`Cache: ${cache_id}, Index: ${result_index}`);
 
       try {
+        // Security: Validate cache_id format to prevent path traversal
+        const CACHE_ID_REGEX = /^exa-\d+-[a-z0-9]+$/;
+        if (!CACHE_ID_REGEX.test(cache_id)) {
+          logger.log(`Invalid cache_id format: ${cache_id}`);
+          return {
+            content: [{
+              type: "text" as const,
+              text: `Invalid cache ID format. Expected format: exa-{timestamp}-{random}\n\nExample: exa-1699564234-abc123`
+            }],
+            isError: true
+          };
+        }
+
         const cached = resultCache.getCachedResults(cache_id);
 
         if (!cached) {

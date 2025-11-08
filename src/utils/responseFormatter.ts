@@ -53,12 +53,16 @@ function createResultStandard(result: ExaSearchResult, index: number, maxChars: 
     : 'No content available';
 
   const lines = [
-    `### Result ${index}: ${result.title}\n`,
+    `### Result ${index}: ${result.title}`,
+    '',
     `**URL**: ${result.url}`,
     `**Published**: ${result.publishedDate || 'Unknown'}`,
     `**Author**: ${result.author || 'Unknown'}`,
-    `**Score**: ${result.score?.toFixed(2) || 'N/A'}\n`,
-    `**Content**:\n${contentPreview}\n`
+    `**Score**: ${result.score?.toFixed(2) || 'N/A'}`,
+    '',
+    `**Content**:`,
+    contentPreview,
+    ''
   ];
 
   return lines.join('\n');
@@ -70,7 +74,8 @@ function createResultStandard(result: ExaSearchResult, index: number, maxChars: 
  */
 function createResultFull(result: ExaSearchResult, index: number): string {
   const lines = [
-    `### Result ${index}: ${result.title}\n`,
+    `### Result ${index}: ${result.title}`,
+    '',
     `**ID**: ${result.id}`,
     `**URL**: ${result.url}`,
     `**Published**: ${result.publishedDate || 'Unknown'}`,
@@ -87,7 +92,8 @@ function createResultFull(result: ExaSearchResult, index: number): string {
   }
 
   lines.push('');
-  lines.push('**Full Content**:\n');
+  lines.push('**Full Content**:');
+  lines.push('');
   lines.push(result.text || 'No content available');
   lines.push('');
 
@@ -160,12 +166,15 @@ export function formatSearchResponse(
 
   // Add cache instructions
   const cacheInstructions = [
-    `**Cache ID**: \`${cacheId}\`\n`,
+    `**Cache ID**: \`${cacheId}\``,
+    '',
     `**Progressive Disclosure**`,
     `- Use cache ID + result index [0-${results.length - 1}] with retrieve_result tool`,
     `- Cache expires in 5 minutes`,
-    `- Current response: ~${metadata.tokenEstimate.estimatedTokens.toLocaleString()} tokens\n`,
-    `---\n`
+    `- Current response: ~${metadata.tokenEstimate.estimatedTokens.toLocaleString()} tokens`,
+    '',
+    `---`,
+    ''
   ];
 
   const fullText = [
@@ -199,10 +208,13 @@ export function formatSingleResult(
   const fullResult = createResultFull(result, index);
 
   const header = [
-    `## Retrieved from Cache\n`,
+    `## Retrieved from Cache`,
+    '',
     `**Cache ID**: \`${cacheId}\``,
-    `**Result**: ${index + 1} of ${totalResults}\n`,
-    `---\n`
+    `**Result**: ${index + 1} of ${totalResults}`,
+    '',
+    `---`,
+    ''
   ].join('\n');
 
   return header + fullResult;
@@ -215,7 +227,8 @@ export function formatErrorResponse(error: Error | string, query?: string): stri
   const errorMessage = error instanceof Error ? error.message : error;
 
   const lines = [
-    `## Search Error\n`,
+    `## Search Error`,
+    '',
     `**Error**: ${errorMessage}`,
   ];
 
@@ -233,39 +246,8 @@ export function formatErrorResponse(error: Error | string, query?: string): stri
   return lines.join('\n');
 }
 
-/**
- * Format guidance for Claude on token management
- */
-export function getTokenManagementGuidance(): string {
-  return `
-📖 TOKEN MANAGEMENT GUIDE FOR THIS MCP SERVER
-
-CONTENT LEVELS:
-• summary   → ~150 tokens/result  | Use for: Quick scanning, high-level overview
-• standard  → ~500 tokens/result  | Use for: Balanced detail, most common use case
-• full      → ~1500 tokens/result | Use for: Deep analysis, comprehensive research
-
-RECOMMENDED PATTERNS:
-1. Start with 'summary' to see what's available (low token cost)
-2. Request specific results by index for deep analysis
-3. Use 'standard' for balanced exploration
-4. Use 'full' only when you need complete content
-
-PROGRESSIVE DISCLOSURE:
-• All results are cached for 5 minutes
-• Request specific results by: cache_id + result_index
-• This prevents loading unnecessary content into context
-
-TOKEN BUDGETS:
-• 3 results (summary):  ~500 tokens   | Cost: ~$0.0015
-• 3 results (standard): ~1,500 tokens | Cost: ~$0.0045
-• 3 results (full):     ~4,500 tokens | Cost: ~$0.0135
-• 10 results (full):    ~15,000 tokens| Cost: ~$0.0450
-
-AVOID TOKEN OVERFLOW:
-• Keep num_results ≤ 5 for 'full' content
-• Use 'summary' for num_results > 5
-• Request specific results instead of returning all
-• Monitor the token estimate in response metadata
-`.trim();
-}
+// Removed: getTokenManagementGuidance() - dead code, not called anywhere
+// Token management guidance is now in:
+// 1. Server description (one-time context)
+// 2. Response metadata (contextual)
+// 3. TOKEN_MANAGEMENT.md (comprehensive docs)

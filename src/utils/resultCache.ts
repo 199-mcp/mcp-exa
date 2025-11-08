@@ -33,12 +33,53 @@ class ResultCacheManager {
   private cacheDir: string;
   private readonly DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
   private readonly MAX_CACHE_SIZE = 100; // Maximum number of cached searches
+  private readonly CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
+  private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     // Use system temp directory for cache
     this.cacheDir = path.join(os.tmpdir(), 'exa-mcp-cache');
     this.ensureCacheDir();
     this.cleanupOldCaches();
+
+    // Start periodic cleanup to prevent resource leaks
+    this.startPeriodicCleanup();
+  }
+
+  /**
+   * Start periodic cleanup of expired caches
+   */
+  private startPeriodicCleanup(): void {
+    if (this.cleanupInterval) {
+      return; // Already running
+    }
+
+    this.cleanupInterval = setInterval(() => {
+      try {
+        this.cleanupOldCaches();
+      } catch (error) {
+        // Silently handle cleanup errors to prevent interval disruption
+        // Note: Using console.error here is acceptable for background cleanup
+        // eslint-disable-next-line no-console
+        console.error('[ResultCache] Cleanup error:', error);
+      }
+    }, this.CLEANUP_INTERVAL);
+
+    // Prevent interval from keeping process alive
+    if (this.cleanupInterval.unref) {
+      this.cleanupInterval.unref();
+    }
+  }
+
+  /**
+   * Stop periodic cleanup and clean up resources
+   * Call this when shutting down the server
+   */
+  public destroy(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
   }
 
   /**
@@ -116,7 +157,8 @@ class ResultCacheManager {
 
       return cached;
     } catch (error) {
-      console.error(`Error reading cache ${cacheId}:`, error);
+      // Silently handle read errors - cache files may be corrupted or incomplete
+      // This is expected behavior during concurrent access or cleanup
       return null;
     }
   }

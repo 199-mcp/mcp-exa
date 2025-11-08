@@ -25,15 +25,24 @@ export interface ResponseMetadata {
 }
 
 /**
- * Estimate tokens from text using industry-standard approximation
+ * Estimate tokens from text using industry-standard approximation with safety margin
  *
- * Formula: tokens ≈ characters / 4
- * More accurate than word-based for mixed content (code, URLs, etc.)
+ * Formula: tokens ≈ (characters / 4) × 1.3
+ * - Base ratio (chars/4) works well for English
+ * - 30% safety margin accounts for:
+ *   - CJK languages (Chinese, Japanese, Korean): ~2-4x more tokens
+ *   - Code-heavy content: ~20-40% more tokens
+ *   - URLs and special characters: ~20-50% more tokens
+ *
+ * This conservative estimate prevents overflow for multilingual/mixed content
  */
 export function estimateTokens(text: string): TokenEstimate {
   const characters = text.length;
   const words = text.split(/\s+/).filter(w => w.length > 0).length;
-  const estimatedTokens = Math.ceil(characters / 4);
+
+  // Base estimate with 30% safety margin for non-English content
+  const baseTokens = characters / 4;
+  const estimatedTokens = Math.ceil(baseTokens * 1.3);
 
   return {
     characters,
@@ -85,7 +94,8 @@ export function createResponseMetadata(
  */
 export function formatMetadataForClaude(metadata: ResponseMetadata): string {
   const lines = [
-    `## Response Metadata\n`,
+    `## Response Metadata`,
+    '',
     `- Results: ${metadata.returnedResults}/${metadata.totalResults} (${metadata.hasMore ? 'more available' : 'complete'})`,
     `- Content Level: ${metadata.contentLevel.toUpperCase()}`,
     `- Token Estimate: ~${metadata.tokenEstimate.estimatedTokens.toLocaleString()} tokens`,

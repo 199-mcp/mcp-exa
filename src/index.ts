@@ -128,9 +128,11 @@ export default function ({ config }: { config?: z.infer<typeof configSchema> } =
       log(`Registered ${registeredTools.length} tools: ${registeredTools.join(', ')}`);
     }
 
-    // Register MCP resource handlers for cached search results
-    registerResourceHandlers(server);
-    log("Resource handlers registered for cached search results");
+    // TODO: MCP resource handlers disabled due to API incompatibility
+    // registerResourceHandlers(server);
+    // log("Resource handlers registered for cached search results");
+    // Issue: TypeScript errors - server.resource() API needs 3-4 args, not object
+    // Fix required: Reimplement using correct MCP SDK resource API
 
     // Return the server object (Smithery CLI handles transport)
     return server.server;
