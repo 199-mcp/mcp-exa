@@ -1,11 +1,11 @@
 /**
- * Web Search Tool (v2 - Optimized)
+ * Web Search Tool (v2 - Token-Aware)
  *
- * Token-aware web search with:
- * - Concise tool descriptions (80% reduction)
- * - Progressive disclosure pattern
- * - Optimized parameter schemas
- * - Simplified response formatting
+ * Enhanced with Context Engineering 2.0 principles:
+ * - Token estimation and reporting
+ * - Progressive disclosure (caching + retrieval)
+ * - Smart defaults to prevent token overflow
+ * - Multi-level content detail (summary/standard/full)
  */
 
 import { z } from "zod";
@@ -15,7 +15,7 @@ import { API_CONFIG } from "./config.js";
 import { ExaSearchRequest, ExaSearchResponse } from "../types.js";
 import { createRequestLogger } from "../utils/logger.js";
 import { getExaClient } from "../utils/axiosClient.js";
-import { formatSearchResponse, formatSingleResult, formatErrorResponse, ContentLevel } from "../utils/responseFormatter.js";
+import { formatSearchResponse, formatSingleResult, formatErrorResponse, getTokenManagementGuidance, ContentLevel } from "../utils/responseFormatter.js";
 import { resultCache } from "../utils/resultCache.js";
 import { calculateMaxCharacters } from "../utils/tokenEstimator.js";
 
@@ -23,23 +23,39 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
   // Main search tool with token-aware responses
   server.tool(
     "web_search",
-    "Real-time web search with configurable detail levels. Returns results with token estimates and cache ID for progressive retrieval.",
+    `Searches the web in real-time with TOKEN-AWARE responses to prevent context overflow.
+
+🎯 WHEN TO USE:
+• Need current information beyond training data
+• Research topics requiring multiple sources
+• Verify facts with recent sources
+
+⚙️ CONTENT LEVELS (choose based on token budget):
+• 'summary' (default)  → ~150 tokens/result | Quick scan, titles + snippets
+• 'standard'          → ~500 tokens/result | Balanced detail, good for exploration
+• 'full'              → ~1500 tokens/result | Complete content, use sparingly
+
+💡 TOKEN MANAGEMENT:
+• Response includes token estimate and cost
+• Results cached for 5 min → request specific results later
+• Use 'summary' first, then request specific results by index
+• IMPORTANT: Responses include metadata to help you manage context
+
+📊 RECOMMENDED USAGE:
+• Quick overview: num_results=5-10, content_level='summary' (~1K tokens)
+• Balanced research: num_results=3-5, content_level='standard' (~2K tokens)
+• Deep analysis: num_results=1-3, content_level='full' (~3-5K tokens)
+
+⚠️ AVOID TOKEN OVERFLOW:
+• Don't use content_level='full' with num_results>5
+• Monitor token estimate in response metadata
+• Use progressive disclosure (cache_id + result_index) for large result sets`,
     {
-      query: z.string().describe(
-        "Search query text"
-      ),
-      num_results: z.number().min(1).max(20).optional().describe(
-        "Number of results to return (default: 3 for standard/full, 5 for summary)"
-      ),
-      content_level: z.enum(['summary', 'standard', 'full']).optional().describe(
-        "Detail level: summary (~150 tok/result), standard (~500 tok/result), full (~1500 tok/result). Default: summary"
-      ),
-      live_crawl: z.enum(['always', 'auto', 'fallback', 'never']).optional().describe(
-        "Content freshness: always=live, auto=balanced, fallback=cached, never=cache-only. Default: auto"
-      ),
-      max_chars_per_result: z.number().min(500).max(5000).optional().describe(
-        "Override smart character limit per result (500-5000)"
-      )
+      query: z.string().describe("Search query (e.g., 'OpenAI GPT-5 release', 'climate change 2024')"),
+      num_results: z.number().optional().describe("Number of results (1-20, default: 3 for 'standard'/'full', 5 for 'summary')"),
+      content_level: z.enum(['summary', 'standard', 'full']).optional().describe("Detail level: 'summary'=titles+snippets, 'standard'=moderate, 'full'=complete (default: 'summary')"),
+      live_crawl: z.enum(['always', 'auto', 'fallback', 'never']).optional().describe("Content freshness: 'always'=fresh, 'auto'=balanced, 'fallback'=cache first (default: 'auto')"),
+      max_chars_per_result: z.number().optional().describe("Max characters per result (overrides content_level defaults, 500-5000)")
     },
     async ({ query, num_results, content_level, live_crawl, max_chars_per_result }) => {
       const requestId = `web_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -130,21 +146,33 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
     }
   );
 
-  // Tool to retrieve specific result from cache (progressive disclosure)
+  // Tool to retrieve specific result from cache
   server.tool(
-    "retrieve_result",
-    "Retrieve individual result from cached search by index. Use after web_search for progressive disclosure.",
+    "get_search_result",
+    `Retrieves a SPECIFIC result from a previous search using progressive disclosure.
+
+🎯 WHEN TO USE:
+• You have a cache_id from a previous web_search
+• Want full content of specific result without loading all results
+• Need to deep-dive into one result while keeping token usage low
+
+💡 PATTERN (Context Engineering):
+1. Call web_search with content_level='summary' (low tokens)
+2. Identify interesting result by index (0, 1, 2, ...)
+3. Call this tool with cache_id + index for full content
+4. Saves ~80% tokens vs. requesting all results in 'full' mode
+
+📊 TOKEN EFFICIENCY:
+• web_search (5 results, summary): ~750 tokens
+• get_search_result (1 result, full): ~1500 tokens
+• Total: ~2250 tokens vs. ~7500 tokens for all results in full mode`,
     {
-      cache_id: z.string().describe(
-        "Cache identifier from previous web_search response (valid 5 minutes)"
-      ),
-      result_index: z.number().min(0).describe(
-        "Zero-based index of result to retrieve (shown in search results)"
-      )
+      cache_id: z.string().describe("Cache ID from previous web_search response"),
+      result_index: z.number().describe("Index of result to retrieve (0-based, shown in search results)")
     },
     async ({ cache_id, result_index }) => {
-      const requestId = `retrieve_result-${Date.now()}`;
-      const logger = createRequestLogger(requestId, 'retrieve_result');
+      const requestId = `get_result-${Date.now()}`;
+      const logger = createRequestLogger(requestId, 'get_search_result');
 
       logger.start(`Cache: ${cache_id}, Index: ${result_index}`);
 
@@ -155,7 +183,7 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
           return {
             content: [{
               type: "text" as const,
-              text: `Cache not found or expired: ${cache_id}\n\nCaches expire after 5 minutes. Please run web_search again.`
+              text: `❌ Cache not found or expired: ${cache_id}\n\nCaches expire after 5 minutes. Please run web_search again.`
             }],
             isError: true
           };
@@ -167,7 +195,7 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
           return {
             content: [{
               type: "text" as const,
-              text: `Invalid result index: ${result_index}\n\nValid range: 0-${cached.totalResults - 1}`
+              text: `❌ Invalid result index: ${result_index}\n\nValid range: 0-${cached.totalResults - 1}`
             }],
             isError: true
           };
@@ -194,6 +222,21 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
           isError: true
         };
       }
+    }
+  );
+
+  // Tool to get token management guidance
+  server.tool(
+    "get_token_guidance",
+    "Returns comprehensive guidance on managing tokens when using Exa search tools. Use when you need to optimize token usage or understand content level options.",
+    {},
+    async () => {
+      return {
+        content: [{
+          type: "text" as const,
+          text: getTokenManagementGuidance()
+        }]
+      };
     }
   );
 }

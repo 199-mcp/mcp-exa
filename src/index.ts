@@ -12,6 +12,7 @@ import { registerLinkedInSearchTool } from "./tools/linkedInSearch.js";
 import { registerWikipediaSearchTool } from "./tools/wikipediaSearch.js";
 import { registerGithubSearchTool } from "./tools/githubSearch.js";
 import { log } from "./utils/logger.js";
+import { registerResourceHandlers } from "./utils/resourceManager.js";
 
 // Configuration schema for the EXA API key and tool selection
 export const configSchema = z.object({
@@ -63,10 +64,11 @@ export default function ({ config }: { config?: z.infer<typeof configSchema> } =
       log("Starting Exa MCP Server in debug mode");
     }
 
-    // Create MCP server
+    // Create MCP server with metadata
     const server = new McpServer({
       name: "exa-search-server",
-      version: "1.0.0"
+      version: "2.0.0",
+      description: "Token-aware web search with progressive disclosure. All responses include token estimates and cache IDs. Use content_level parameter to control detail (summary/standard/full). Results cached 5min for follow-up retrieval."
     });
     
     log("Server initialized with modern MCP SDK and Smithery CLI support");
@@ -125,7 +127,11 @@ export default function ({ config }: { config?: z.infer<typeof configSchema> } =
     if (actualConfig.debug) {
       log(`Registered ${registeredTools.length} tools: ${registeredTools.join(', ')}`);
     }
-    
+
+    // Register MCP resource handlers for cached search results
+    registerResourceHandlers(server);
+    log("Resource handlers registered for cached search results");
+
     // Return the server object (Smithery CLI handles transport)
     return server.server;
     
