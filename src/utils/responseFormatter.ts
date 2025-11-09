@@ -13,6 +13,7 @@ import { estimateTokens, formatMetadataForClaude, createResponseMetadata, calcul
 import { resultCache } from './resultCache.js';
 
 export type ContentLevel = 'summary' | 'standard' | 'full';
+export type OutputFormat = 'markdown' | 'json';
 
 export interface FormattedResponse {
   text: string;
@@ -22,6 +23,19 @@ export interface FormattedResponse {
     resultCount: number;
     contentLevel: ContentLevel;
   };
+}
+
+export interface JSONSearchResponse {
+  metadata: {
+    cacheId?: string;
+    totalResults: number;
+    returnedResults: number;
+    contentLevel: ContentLevel;
+    tokenEstimate: number;
+    requestId?: string;
+    searchType?: string;
+  };
+  results: ExaSearchResult[];
 }
 
 /**
@@ -101,7 +115,46 @@ function createResultFull(result: ExaSearchResult, index: number): string {
 }
 
 /**
- * Format search response with smart token management
+ * Format search response as JSON for code execution environments
+ */
+export function formatSearchResponseJSON(
+  response: ExaSearchResponse,
+  query: string,
+  contentLevel: ContentLevel = 'standard'
+): JSONSearchResponse {
+  const results = response.results || [];
+
+  // Always cache results for progressive disclosure
+  const cacheId = resultCache.cacheResults(
+    query,
+    results,
+    {
+      requestId: response.requestId,
+      searchType: response.resolvedSearchType || response.searchType,
+      autopromptString: response.autopromptString
+    }
+  );
+
+  // Estimate tokens for JSON output
+  const jsonString = JSON.stringify({ results }, null, 2);
+  const tokenEstimate = estimateTokens(jsonString).estimatedTokens;
+
+  return {
+    metadata: {
+      cacheId,
+      totalResults: results.length,
+      returnedResults: results.length,
+      contentLevel,
+      tokenEstimate,
+      requestId: response.requestId,
+      searchType: response.resolvedSearchType || response.searchType
+    },
+    results
+  };
+}
+
+/**
+ * Format search response with smart token management (Markdown)
  */
 export function formatSearchResponse(
   response: ExaSearchResponse,

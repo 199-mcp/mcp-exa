@@ -137,6 +137,123 @@ web_search({
 
 ---
 
+## 📦 Output Formats
+
+### Markdown (Default) - Human-Readable
+Best for presenting results directly to users or when you need formatted output.
+
+```javascript
+web_search({
+  query: "AI research",
+  output_format: "markdown" // or omit for default
+})
+```
+
+Returns formatted markdown with metadata, cache instructions, and styled content.
+
+### JSON - Code-Friendly (⭐ NEW)
+**Best for code execution environments** - enables filtering, transformation, and data manipulation without token overhead.
+
+```javascript
+web_search({
+  query: "AI research papers 2024",
+  output_format: "json",
+  num_results: 10
+})
+```
+
+Returns structured JSON:
+```json
+{
+  "metadata": {
+    "cacheId": "exa-1234567890-abc",
+    "totalResults": 10,
+    "tokenEstimate": 2500,
+    "contentLevel": "summary"
+  },
+  "results": [
+    {
+      "id": "...",
+      "title": "Paper Title",
+      "url": "https://...",
+      "publishedDate": "2024-01-15",
+      "author": "...",
+      "text": "...",
+      "score": 0.95
+    }
+  ]
+}
+```
+
+### When to Use JSON Format
+
+✅ **Use JSON when**:
+- Filtering results (by date, score, domain, etc.)
+- Transforming data (map, reduce, aggregate)
+- Working in code execution environment
+- Chaining multiple operations
+- Saving results to files
+
+📊 **Token Efficiency Example**:
+```javascript
+// Scenario: Find 2024 papers from 20 results
+
+// ❌ Markdown: ~10,000 tokens (all results in context)
+const response = await web_search({
+  query: "AI papers",
+  num_results: 20,
+  output_format: "markdown"
+});
+// Claude reads all 20, filters in response
+
+// ✅ JSON: ~2,000 tokens (filtered results only)
+const response = await web_search({
+  query: "AI papers",
+  num_results: 20,
+  output_format: "json"
+});
+const data = JSON.parse(response);
+const recent = data.results.filter(r =>
+  new Date(r.publishedDate) > new Date('2024-01-01')
+);
+// Only 5 matching results enter Claude's context
+
+// Result: 80% token reduction!
+```
+
+**Code Execution Examples**:
+
+```javascript
+// Example 1: Score-based filtering
+const data = JSON.parse(await web_search({
+  query: "transformers",
+  output_format: "json",
+  num_results: 15
+}));
+
+const highQuality = data.results
+  .filter(r => r.score > 0.9)
+  .sort((a, b) => b.score - a.score);
+
+// Example 2: Domain aggregation
+const byDomain = data.results.reduce((acc, r) => {
+  const domain = new URL(r.url).hostname;
+  acc[domain] = (acc[domain] || 0) + 1;
+  return acc;
+}, {});
+
+// Example 3: Custom transformation
+const summaries = data.results.map(r => ({
+  title: r.title,
+  date: r.publishedDate,
+  snippet: r.text.substring(0, 200)
+}));
+```
+
+See `JSON_OUTPUT_EXAMPLES.md` for comprehensive examples and patterns.
+
+---
+
 ## 🔄 Progressive Disclosure Pattern
 
 ### The Problem

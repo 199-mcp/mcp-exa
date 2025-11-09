@@ -15,7 +15,7 @@ import { API_CONFIG } from "./config.js";
 import { ExaSearchRequest, ExaSearchResponse } from "../types.js";
 import { createRequestLogger } from "../utils/logger.js";
 import { getExaClient } from "../utils/axiosClient.js";
-import { formatSearchResponse, formatSingleResult, formatErrorResponse, ContentLevel } from "../utils/responseFormatter.js";
+import { formatSearchResponse, formatSearchResponseJSON, formatSingleResult, formatErrorResponse, ContentLevel, OutputFormat } from "../utils/responseFormatter.js";
 import { resultCache } from "../utils/resultCache.js";
 import { calculateMaxCharacters } from "../utils/tokenEstimator.js";
 
@@ -34,6 +34,9 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
       content_level: z.enum(['summary', 'standard', 'full']).optional().describe(
         "Detail level: summary (~150 tok/result), standard (~500 tok/result), full (~1500 tok/result). Default: summary"
       ),
+      output_format: z.enum(['markdown', 'json']).optional().describe(
+        "Response format: markdown (human-readable, default) or json (code-friendly for filtering/transformation)"
+      ),
       live_crawl: z.enum(['always', 'auto', 'fallback', 'never']).optional().describe(
         "Content freshness: always=live, auto=balanced, fallback=cached, never=cache-only. Default: auto"
       ),
@@ -41,7 +44,7 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
         "Override smart character limit per result (500-5000)"
       )
     },
-    async ({ query, num_results, content_level, live_crawl, max_chars_per_result }) => {
+    async ({ query, num_results, content_level, output_format, live_crawl, max_chars_per_result }) => {
       const requestId = `web_search-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       const logger = createRequestLogger(requestId, 'web_search');
 
@@ -94,25 +97,49 @@ export function registerWebSearchTool(server: McpServer, config?: { exaApiKey?: 
 
         logger.log(`Found ${response.data.results.length} results`);
 
-        // Format response with token-awareness
-        const formatted = formatSearchResponse(
-          response.data,
-          query,
-          actualContentLevel,
-          25000 // Safe limit to prevent 32K overflow
-        );
+        // Format response based on output format
+        const actualOutputFormat: OutputFormat = output_format || 'markdown';
 
-        logger.log(`Formatted response: ~${formatted.metadata.totalTokens} tokens`);
+        if (actualOutputFormat === 'json') {
+          // JSON format for code execution environments
+          const jsonResponse = formatSearchResponseJSON(
+            response.data,
+            query,
+            actualContentLevel
+          );
 
-        const result = {
-          content: [{
-            type: "text" as const,
-            text: formatted.text
-          }]
-        };
+          logger.log(`Formatted JSON response: ~${jsonResponse.metadata.tokenEstimate} tokens`);
 
-        logger.complete();
-        return result;
+          const result = {
+            content: [{
+              type: "text" as const,
+              text: JSON.stringify(jsonResponse, null, 2)
+            }]
+          };
+
+          logger.complete();
+          return result;
+        } else {
+          // Markdown format (default) for human-readable output
+          const formatted = formatSearchResponse(
+            response.data,
+            query,
+            actualContentLevel,
+            25000 // Safe limit to prevent 32K overflow
+          );
+
+          logger.log(`Formatted response: ~${formatted.metadata.totalTokens} tokens`);
+
+          const result = {
+            content: [{
+              type: "text" as const,
+              text: formatted.text
+            }]
+          };
+
+          logger.complete();
+          return result;
+        }
 
       } catch (error) {
         logger.error(error);
